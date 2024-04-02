@@ -171,7 +171,7 @@ class NonlinearSolver( BaseModule ):
       globdat.lam  = self.loadfunc( globdat.solverStatus.time )
       lam0         = self.loadfunc( globdat.solverStatus.time - globdat.solverStatus.dtime )
     
-      globdat.dlam = globdat.lam - lam0
+      globdat.dlam = (globdat.lam - lam0)/90
       globdat.dofs.setConstrainFactor( globdat.dlam )
     
       globdat.solverStatus.lam = globdat.lam
@@ -185,7 +185,7 @@ class NonlinearSolver( BaseModule ):
         loadfunc = eval ( "lambda t : " + str(loadProps.loadFunc) )
         lam  = loadfunc( globdat.solverStatus.time )
         lam0 = loadfunc( globdat.solverStatus.time - globdat.solverStatus.dtime )
-        dlam = lam - lam0
+        dlam = (lam - lam0)/90
         globdat.dofs.setConstrainFactor( dlam , loadProps.nodeTable )
         
         logger.debug('  ---- %s ---------------------' %loadCase)
