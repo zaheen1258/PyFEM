@@ -34,11 +34,14 @@
   u[1]     = 0.0;
   v[1]     = 0.0;
   w[clamped]     = 0.0;
-  w[load_nodes1] = 0.02;
 
 </NodeConstraints>
 
 <ExternalForces>
+  w[5] = 0.05;
+  w[6] = 0.05;
+  w[7] = 0.05;
+  w[8] = 0.05;
 </ExternalForces>
 
 

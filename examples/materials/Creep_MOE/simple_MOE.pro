@@ -35,8 +35,8 @@ Continuum =
     type   = "PowerLawCreepMOE";
     E      = 160e3;
     nu     = 0.33;
-    rhoc = 4669.9511535360325;
-    rhow = 4406641771830.477;
+    rhoc = 1e11;
+    rhow = 1e12;
     Temp = 1050.0690046472204;
     flux = 9.998075715064236e-08;
   };
@@ -45,11 +45,11 @@ Continuum =
 solver =
 {
   type = "NonlinearSolver";
-  maxCycle = 8;
-  iterMax = 1
+  maxCycle = 1000;
+  iterMax = 100;
   dtime    = 1;
   time = 1;
-  tol = 1e-12;
+  tol = 1e-8;
 };
 
 outputModules = ["vtk", "GraphWriter"];
@@ -71,7 +71,7 @@ GraphWriter =
     node = 5;
     dof  = 'w';
   };
- 
+
   load =
   {
     type = "fint";

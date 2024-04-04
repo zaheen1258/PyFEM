@@ -13,14 +13,14 @@
 #  A github repository, with the most up to date version of the code,          #
 #  can be found here:                                                          #
 #     https://github.com/jjcremmers/PyFEM/                                     #
-#     https://pyfem.readthedocs.io/                                            #	
+#     https://pyfem.readthedocs.io/                                            #
 #                                                                              #
 #  The original code can be downloaded from the web-site:                      #
 #     http://www.wiley.com/go/deborst                                          #
 #                                                                              #
 #  The code is open source and intended for educational and scientific         #
 #  purposes only. If you use PyFEM in your research, the developers would      #
-#  be grateful if you could cite the book.                                     #    
+#  be grateful if you could cite the book.                                     #
 #                                                                              #
 #  Disclaimer:                                                                 #
 #  The authors reserve all rights but do not guarantee that the code is        #
@@ -67,13 +67,13 @@ class NonlinearSolver( BaseModule ):
     globdat.solverStatus.dtime = self.dtime
 
     self.loadfunc = eval ( "lambda t : " + str(self.loadFunc) )
-       
+
     if hasattr(self,"loadTable"):
       self.maxCycle      = len(self.loadTable)
       loadTable          = zeros(self.maxCycle+1)
       loadTable[1:]      = self.loadTable
       self.loadTable     = loadTable
- 
+
     logger.info("Starting nonlinear solver .........")
 
 #------------------------------------------------------------------------------
@@ -83,44 +83,44 @@ class NonlinearSolver( BaseModule ):
   def run( self , props , globdat ):
 
     stat = globdat.solverStatus
-    
+
     stat.increaseStep()
-    
+
     dofCount = len(globdat.dofs)
-    
+
     a     = globdat.state
     Da    = globdat.Dstate
 
     Da[:] = zeros( dofCount )
-    fint  = zeros( dofCount ) 
-    
+    fint  = zeros( dofCount )
+
     logger.info("Nonlinear solver ............")
     logger.info("    =============================================")
     logger.info("    Load step %i"%globdat.solverStatus.cycle)
     logger.info("    =============================================")
     logger.info('    Newton-Raphson   : L2-norm residual')
-    
+
     self.setLoadAndConstraints( globdat )
-    
+
     K,fint = assembleTangentStiffness( props, globdat )
 
     error = 1.
 
     self.setLoadAndConstraints( globdat )
-    
+
     fext   = assembleExternalForce   ( props, globdat )
-        
+
     while error > self.tol:
 
       stat.iiter += 1
-	      
+
       da = globdat.dofs.solve( K, fext - fint )
 
       Da[:] += da[:]
       a [:] += da[:]
 
       K,fint = assembleTangentStiffness( props, globdat )
-  
+
       # note that the code is different from the one presented in the book, which
       # is slightly shorter for the sake of clarity.
       # In the case of a prescribed displacement, the external force is zero
@@ -128,7 +128,7 @@ class NonlinearSolver( BaseModule ):
       # divided by the norm of the external force.
 
       norm = globdat.dofs.norm( fext )
-  
+
       if norm < 1.0e-16:
         error = globdat.dofs.norm( fext-fint )
       else:
@@ -142,38 +142,38 @@ class NonlinearSolver( BaseModule ):
         raise RuntimeError('Newton-Raphson iterations did not converge!')
 
     # Converged
-    
+
     globdat.elements.commitHistory()
 
     Da[:]  = zeros( len(globdat.dofs) )
 
     globdat.fint = fint
-    
+
     if stat.cycle == self.maxCycle or globdat.lam > self.maxLam:
-      globdat.active = False 
+      globdat.active = False
 
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------
 
   def setLoadAndConstraints( self , globdat ):
- 
+
     if hasattr(self,"loadTable"):
       cycle = globdat.solverStatus.cycle
-      
+
       globdat.lam  = self.loadTable[cycle]
       globdat.dlam = self.loadTable[cycle]-self.loadTable[cycle-1]
 
       globdat.dofs.setConstrainFactor( globdat.dlam )
-            
+
       globdat.solverStatus.lam = globdat.lam
-    else:   
+    else:
       globdat.lam  = self.loadfunc( globdat.solverStatus.time )
       lam0         = self.loadfunc( globdat.solverStatus.time - globdat.solverStatus.dtime )
-    
-      globdat.dlam = (globdat.lam - lam0)/90
+
+      globdat.dlam = (globdat.lam - lam0)
       globdat.dofs.setConstrainFactor( globdat.dlam )
-    
+
       globdat.solverStatus.lam = globdat.lam
 
       logger.debug('  ---- main load -------------------------')
@@ -185,11 +185,11 @@ class NonlinearSolver( BaseModule ):
         loadfunc = eval ( "lambda t : " + str(loadProps.loadFunc) )
         lam  = loadfunc( globdat.solverStatus.time )
         lam0 = loadfunc( globdat.solverStatus.time - globdat.solverStatus.dtime )
-        dlam = (lam - lam0)/90
+        dlam = (lam - lam0)
         globdat.dofs.setConstrainFactor( dlam , loadProps.nodeTable )
-        
+
         logger.debug('  ---- %s ---------------------' %loadCase)
         logger.debug('    loadFactor       : %4.2f'%lam)
         logger.debug('    incr. loadFactor : %4.2f'%dlam)
 
-      
+
