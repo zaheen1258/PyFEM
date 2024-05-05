@@ -1,0 +1,49 @@
+<Nodes>
+ 1   0.0  0.0  0.0;
+ 2   1  0.0  0.0;
+ 3   1.0  1  0.0;
+ 4   0  1  0.0 ;
+ 5   0  0.0  1 ;
+ 6   1  0.0  1 ;
+ 7   1  1.0  1 ;
+ 8   0  1.0  1 ;
+</Nodes>
+
+
+<Elements>
+  1  "Continuum"  1  2 3 4 5 6 7 8;
+</Elements>
+
+
+<NodeGroup name = "clamped">
+
+  { 1 2 3 4 }
+
+</NodeGroup>
+
+
+<NodeGroup name = "load_nodes1">
+
+  { 5 6 7 8 }
+
+</NodeGroup>
+
+
+<NodeConstraints>
+
+  u[1]     = 0.0;
+  v[1]     = 0.0;
+  w[clamped]     = 0.0;
+
+</NodeConstraints>
+
+<ExternalForces>
+
+  w[5] = 0.43;
+  w[6] = 0.43;
+  w[7] = 0.43;
+  w[8] = 0.43;
+
+</ExternalForces>
+
+
